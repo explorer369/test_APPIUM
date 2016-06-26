@@ -8,6 +8,16 @@ from  selenium.webdriver.support.ui import WebDriverWait
 global driver,Testtime
 localpath = os.getcwd()
 
+def finddevices():
+    rst = os.popen('adb devices').readlines()
+    devices = ''.join(rst)
+    devices =  devices.count("device")
+    if devices > 1:
+        print ('共找到%s个手机'%(devices-1))
+        return 'yes'
+    else:
+        print ('没有找到手机，请连接后再重试！')
+
 def cleanEnv():
     '''每次执行命令时就把此rst目录删除,然后再新建rst,相当于清空上次的测试结果和日志
     '''                        
