@@ -164,6 +164,7 @@ def getdevices():
            # 'app-activity':'.general.appmanage.AppStart' # package name 和 app-activity 的获取方法你可以看看 appium 的实现。当你没给这两个参数时，它会通过解析 apk 文件自动获取这两个参数。
      }
     '''
+
 def start_Appium(host, port, bootstrap_port, appium_log_path):
     '''命令方法后台启动APPIUM
     用法：start_Appium('localhost','4723','4780','rst/appium.log')
@@ -188,9 +189,9 @@ def cur_file_dir():
          return os.path.dirname(path)
 #打印结果
 #getpath = cur_file_dir()
-def stop_Appium(Appium_url):
-    '''命令停止APPIUM，使用方法：stop_Appium('http://127.0.0.1:4723/wd/hub')
-    '''
+'''
+# 调用BAT脚本方式结束APPIUM服务
+def stop_Appium(Appium_url): 
  #   Appium_url = http://localhost:4723/wd/hub
     a = Appium_url.split(":")[2].split("/")[0]
     cmd = ('StopAppium.bat %s'%a)
@@ -200,3 +201,14 @@ def stop_Appium(Appium_url):
         print '执行关闭APPIUM服务命令成功，状态：%s'%p
  #   print p.read()
 #stop_Appium('http://127.0.0.1:4723/wd/hub')  # 调用方法
+'''
+def stop_Appium(Appium_url):
+    #stop_Appium('http://127.0.0.1:4723/wd/hub')
+    a = Appium_url.split(":")[2].split("/")[0]
+    cmd = 'netstat -aon | findstr %s'%a
+    p = os.popen(cmd).readlines()    #执行当前目录的BAT文件必须用system,用os.popen(cmd)就不行
+    if p:  #判断列表不为空时
+        p = ''.join(p).split('LISTENING')[1].split()[0].strip()#以LISTENING来判断真正的PID，避免TIME_WAIT或ESTABLISHED状态
+        cmd = 'taskkill /f /pid %s'%p
+        os.popen(cmd)
+        print '执行关闭APPIUM服务命令成功，PID为：%s'%p
