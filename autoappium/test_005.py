@@ -2,15 +2,14 @@
 import os,sys,time,re,xlrd
 import log,logging
 import unittest
-from find import *
+from find import getdevices
 #from selenium import webdriver
 from appium import webdriver
 #导入等待时间包
 from  selenium.webdriver.support.ui import WebDriverWait
 global driver,Testtime
 optpath = os.getcwd()                      #获取当前操作目录（此文件夹所在目录）
-imgpath = os.path.join(optpath,'img')      #截图目录（如：D:\Python27\img，也就是在当前目录生成一个IMG文件夹）
-logger = log.Logger('rst\log.log',clevel = logging.DEBUG,Flevel = logging.INFO)
+#imgpath = os.path.join(optpath,'img')      #截图目录（如：D:\Python27\img，也就是在当前目录生成一个IMG文件夹）
 # Returns abs path relative to this file and not cwd
 PATH = lambda p: os.path.abspath(
     os.path.join(os.path.dirname(__file__), p)
@@ -42,7 +41,7 @@ class AndroidTest(unittest.TestCase):
     def setUp(self):     
   #     devicename,andriodVersion,deviceModelName,packagename = getdevices() #此处获取了包名，如想自动获取请在getDevices下设置要获取的APK路径
         devicename,andriodVersion,deviceModelName = getdevices()
-        print '当前连接的机器SN为：%s 版本为：%s 型号为:%s'%(devicename,andriodVersion,deviceModelName)
+        print u'当前连接的机器型号为：%s 版本为：%s SN为:%s'%(deviceModelName,andriodVersion,devicename)
         desired_caps = {}
         desired_caps['platformName'] = 'Android'
         desired_caps['platformVersion'] = andriodVersion  # 连上手机自动获取
@@ -51,21 +50,25 @@ class AndroidTest(unittest.TestCase):
         desired_caps['appActivity'] = 'com.myticket.activity.WelcomeActivity'
         desired_caps['unicodeKeyboard'] = True    #加上这两行可以输入中文了，输入的时候不会弹出输入法，有些元素不会被盖住
         desired_caps['resetKeyboard'] = True
-        self.driver = webdriver.Remote('http://localhost:4723/wd/hub', desired_caps)
+        try:
+            self.driver = webdriver.Remote('http://localhost:4723/wd/hub', desired_caps)
+        except Exception,e:
+            print u'APPIUM服务未能正常开启，请检查是否开启或端口号是否一致'
     def tearDown(self):
         self.driver.close_app()
         self.driver.quit()       
     def test12308click(self):                  
-            time.sleep(4)
+            time.sleep(10)
             listdata = excel_table_byindex('data.xlsx',0) # 路径不要用中文
             if(len(listdata) <= 0 ):
                 assert 0,u"Excel数据库异常" 
             for i in range(0,int(len(listdata))):
-                print 'Excel中共有：%s 行数据'%(len(listdata))
+                print u'Excel中共有：%s 行数据'%(len(listdata))
                 time.sleep(6)
                 self.func("id","com.wxws.myticket:id/etBecity")
                 time.sleep(1)
                 self.driver.find_element_by_id('com.wxws.myticket:id/etSearch').send_keys(listdata[i]['username'])
+                print u'输入了用户名'
                 self.func('calss_names','android.widget.TextView',1)
                 time.sleep(1)
              #   self.func("id","com.wxws.myticket:id/tv_cancel")
@@ -79,7 +82,7 @@ class AndroidTest(unittest.TestCase):
                 self.func("id","com.wxws.myticket:id/btnQuery")
                 time.sleep(2)
                 self.driver.get_screenshot_as_file("rst\\screenshot\\Passed\\test.png")
-            self.driver.close_app()
+            
             
 
 
