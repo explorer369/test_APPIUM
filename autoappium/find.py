@@ -8,6 +8,7 @@ from  selenium.webdriver.support.ui import WebDriverWait
 global driver,Testtime
 localpath = os.getcwd()
 
+#logger = log.Logger('rst/log.log',clevel = logging.DEBUG,Flevel = logging.INFO)
 def finddevices():
     rst = os.popen('adb devices').readlines()
     devices = ''.join(rst)
@@ -32,10 +33,12 @@ def cleanEnv():
         elif os.path.isdir(delpath):       # 否则，删除delpath得到的两个文件夹（img和rst）
             cmd = 'rd /s/q "%s"' %delpath
             os.system(cmd)
-    if not os.path.isdir('rst'):
-        os.makedirs('rst')          
+    if not os.path.isdir('rst/screenshot'):
+     #   os.makedirs('rst')          
         os.makedirs('rst/screenshot/Failed')
         os.makedirs('rst/screenshot/Passed')
+cleanEnv() #让导入此文件时就执行清除件和新建文件
+logger = log.Logger('rst/log.log',clevel = logging.DEBUG,Flevel = logging.INFO)        
 def find_name(self,method,TEXT,number=0):
         '''用法：self.find_name('id','com.wxws.myticket:id/rl_notification')
                self.find_name('name','点击')
@@ -43,17 +46,17 @@ def find_name(self,method,TEXT,number=0):
                self.find_name('calss_names','android.widget.TextView',1)
                self.find_name('xpath',"//android.view.View[@index='2']")
         '''
-        #此处logger和eclipse上输出日志有关联，加到这里eclipse上输了的日志不会重复
-        logger = log.Logger('rst/log.log',clevel = logging.DEBUG,Flevel = logging.INFO)    
+        #此处logger和eclipse上输出日志有关联，加到这里会重复
+        
         Testtime=time.strftime('%Y%m%d%H%M%S',time.localtime(time.time()))
         if method == "name":
             try:
                 emmm = self.driver.find_element_by_name(TEXT)
                 #self.assertIsNotNone(emm)
-                print logger.info('+PASS+  Find the"%s"element'%TEXT)
+                logger.info('+PASS+  Find the"%s"element'%TEXT)
                 emmm.click()
                 self.driver.get_screenshot_as_file("rst\\screenshot\\Passed\\%s.png"%Testtime)
-                print logger.info('+PASS+  Click on the "%s" element to succeed��Already screenshot'%TEXT)
+                logger.info('+PASS+  Click on the "%s" element to succeed��Already screenshot'%TEXT)
             except NoSuchElementException, e:
               # print logger.info("Did not get to the control, click failed")
                 self.driver.get_screenshot_as_file("rst\\screenshot\\Failed\\%s.png"%Testtime)
@@ -63,10 +66,10 @@ def find_name(self,method,TEXT,number=0):
             try:
                 emmm = self.driver.find_element_by_id(TEXT)
                 #self.assertIsNotNone(emm)
-                print logger.info('+PASS+  Find the"%s"element'%TEXT)
+                logger.info('+PASS+  Find the"%s"element'%TEXT)
                 emmm.click()
                 self.driver.get_screenshot_as_file("rst\\screenshot\\Passed\\%s.png"%Testtime)
-                print logger.info('+PASS+  Click on the "%s" element to succeed��Already screenshot'%TEXT)
+                logger.info('+PASS+  Click on the "%s" element to succeed��Already screenshot'%TEXT)
             except NoSuchElementException, e:
                 time.sleep(1)
               # print logger.info("Did not get to the control, click failed")
@@ -77,10 +80,10 @@ def find_name(self,method,TEXT,number=0):
             try:
                 emmm = self.driver.find_element_by_xpath(TEXT)
                 #self.assertIsNotNone(emm)
-                print logger.info('+PASS+  Find the"%s"element'%TEXT)
+                logger.info('+PASS+  Find the"%s"element'%TEXT)
                 emmm.click()
                 self.driver.get_screenshot_as_file("rst\\screenshot\\Passed\\%s.png"%Testtime)
-                print logger.info('+PASS+  Click on the "%s" element to succeed��Already screenshot'%TEXT)
+                logger.info('+PASS+  Click on the "%s" element to succeed��Already screenshot'%TEXT)
             except NoSuchElementException, e:
                 time.sleep(1)
               # print logger.info("Did not get to the control, click failed")
@@ -91,11 +94,11 @@ def find_name(self,method,TEXT,number=0):
             try:
                 emmm = self.driver.find_element_by_calss_name(TEXT)
                 #self.assertIsNotNone(emm)
-                print logger.info('+PASS+  Find the"%s"element'%TEXT)
+                logger.info('+PASS+  Find the"%s"element'%TEXT)
                 emmm.click()
                 time.sleep(1)
                 self.driver.get_screenshot_as_file("rst\\screenshot\\Passed\\%s.png"%Testtime)
-                print logger.info('+PASS+  Click on the "%s" element to succeed��Already screenshot'%TEXT)
+                logger.info('+PASS+  Click on the "%s" element to succeed��Already screenshot'%TEXT)
             except NoSuchElementException, e:
                 time.sleep(1)
               # print logger.info("Did not get to the control, click failed")
@@ -105,11 +108,11 @@ def find_name(self,method,TEXT,number=0):
         if method == "calss_names":
             try:
                 lis = self.driver.find_elements_by_class_name(TEXT)
-                print logger.info('+PASS+  Find the"%s"element'%TEXT)                            
+                logger.info('+PASS+  Find the"%s"element'%TEXT)                            
                 print lis[number].click()                  
                 time.sleep(1)
                 self.driver.get_screenshot_as_file("rst\\screenshot\\Passed\\%s.png"%Testtime)
-                print logger.info('+PASS+  Click on the "%s" element to succeed��Already screenshot'%TEXT)
+                logger.info('+PASS+  Click on the "%s" element to succeed��Already screenshot'%TEXT)
             except NoSuchElementException, e:
                 time.sleep(1)
               # print logger.info("Did not get to the control, click failed")
@@ -203,12 +206,14 @@ def stop_Appium(Appium_url):
 #stop_Appium('http://127.0.0.1:4723/wd/hub')  # 调用方法
 '''
 def stop_Appium(Appium_url):
-    #stop_Appium('http://127.0.0.1:4723/wd/hub')
-    a = Appium_url.split(":")[2].split("/")[0]
-    cmd = 'netstat -aon | findstr %s'%a
-    p = os.popen(cmd).readlines()    #执行当前目录的BAT文件必须用system,用os.popen(cmd)就不行
-    if p:  #判断列表不为空时
-        p = ''.join(p).split('LISTENING')[1].split()[0].strip()#以LISTENING来判断真正的PID，避免TIME_WAIT或ESTABLISHED状态
-        cmd = 'taskkill /f /pid %s'%p
-        os.popen(cmd)
-        print '执行关闭APPIUM服务命令成功，PID为：%s'%p
+        #stop_Appium('http://127.0.0.1:4723/wd/hub')
+        a = Appium_url.split(":")[2].split("/")[0]
+        cmd = 'netstat -aon | findstr %s'%a
+        p = os.popen(cmd).readlines()    #执行当前目录的BAT文件必须用system,用os.popen(cmd)就不行
+        if p:  #判断列表不为空时
+            p = ''.join(p).split('LISTENING')[1].split()[0].strip()#以LISTENING来判断真正的PID，避免TIME_WAIT或ESTABLISHED状态
+            cmd = 'taskkill /f /pid %s'%p
+            os.popen(cmd)
+            print '执行关闭APPIUM服务命令成功，PID为：%s'%p
+        else:
+            print 'kill APPIUM服务失败，传入的端口号是 %s ，请检查是否开启或端口是否不一致！'%a  
