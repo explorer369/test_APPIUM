@@ -20,11 +20,11 @@ class Logger:
         self.logger = logging.getLogger(path)
         self.logger.setLevel(logging.DEBUG)
         fmt = logging.Formatter('[%(asctime)s] [%(levelname)s] %(message)s', '%Y-%m-%d %H:%M:%S')
-        #设置CMD日志
+        #锟斤拷锟斤拷CMD锟斤拷志
         sh = logging.StreamHandler()
         sh.setFormatter(fmt)
         sh.setLevel(clevel)
-        #设置文件日志
+        #锟斤拷锟斤拷锟侥硷拷锟斤拷志
         fh = logging.FileHandler(path)
         fh.setFormatter(fmt)
         fh.setLevel(Flevel)
@@ -54,8 +54,8 @@ class Logger:
  
 if __name__ =='__main__':
     logyyx = Logger('yyx.log',logging.WARNING,logging.DEBUG)
-    logyyx.debug('一个debug信息')
-    logyyx.info('一个info信息')
-    logyyx.war('一个warning信息')
-    logyyx.error('一个error信息')
-    logyyx.cri('一个致命critical信息')
+    logyyx.debug('一锟斤拷debug锟斤拷息')
+    logyyx.info('一锟斤拷info锟斤拷息')
+    logyyx.war('一锟斤拷warning锟斤拷息')
+    logyyx.error('一锟斤拷error锟斤拷息')
+    logyyx.cri('一锟斤拷锟斤拷锟斤拷critical锟斤拷息')
